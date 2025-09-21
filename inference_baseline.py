@@ -5,7 +5,6 @@ from rouge_score import rouge_scorer, scoring
 import json
 import argparse
 
-# 以下是新加的
 import sacrebleu as scb
 from packaging import version
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
@@ -89,10 +88,6 @@ class RougeEvaluator:
         rl_res = rl_eval_obj.compute_rouge_l(references=ground_truth, predictions=predictions)
         return rl_res
 
-    # def b2_eval(ground_truth:list, predictions:list):
-    #     b2_eval_obj = BleuEvaluator()
-    #     b2_res = b2_eval_obj.compute_bleu_2(references=ground_truth, predictions=predictions)
-    #     return b2_res
 
     def rl_eval_file(ground_truth_path: str, predictions_path: str):
         with open(ground_truth_path, 'r', encoding='utf-8') as ground_truth_f, open(predictions_path, 'r',
@@ -152,7 +147,6 @@ class RougeEvaluator:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Eval GYAFC')
     parser.add_argument('--file', type=str, required=True, help='Path to the input JSON file')
-    # 解析命令行参数
     args = parser.parse_args()
     eval(args.file)
     # eval_shac(args.file)

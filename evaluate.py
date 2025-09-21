@@ -24,8 +24,8 @@ from graphrag.query.indexer_adapters import (
     read_indexer_entities,
     read_indexer_reports,
 )
-# /vepfs/DI/beijing-public/models/Qwen2-7B-Instruct
 LN = "\n"
+URL_HOST=""
 
 
 class GBOP():
@@ -45,7 +45,6 @@ class GBOP():
         headers = self._build_headers()
 
         headers["X-DashScope-SSE"] = "enable"
-        # res = requests.post(url, json=http_body, headers=headers)
         pattern = r'"content":"([^"]+)"'
         # think_pattern
         for attempt in range(15):
@@ -64,7 +63,7 @@ class GBOP():
             except:
                 if attempt < 14:
                     time.sleep(10)
-                    print(f"请求失败，正在尝试第 {attempt + 1} 次重试")
+                    print(f"request fail， {attempt + 1} retry!!")
 
     def chat(self, http_body):
         url = self._build_url()
@@ -81,7 +80,6 @@ class GBOP():
             except requests.exceptions.RequestException as e:
                 if attempt < 9:
                     time.sleep(30)
-                    print(f"请求失败，正在尝试第 {attempt + 1} 次重试")
 
     def _build_url(self):
         query_string = self._build_query_string()
@@ -95,7 +93,7 @@ class GBOP():
             return query_string
         queries_dic = sorted(self.queries)
         for k in queries_dic:
-            if type(self.queries[k]) == list:  # 参数的value为数组，则对数组中的元素排序
+            if type(self.queries[k]) == list:
                 self.queries[k].sort()
                 for i in self.queries[k]:
                     item_string = "%s=%s" % (k, i)
@@ -152,7 +150,6 @@ class Graphrag(GBOP):
             'qwen-max.api-dev.test.geely.svc',
             full_function
         )
-        # /vepfs/DI/user/wyh/Personal_Chat_Agent/GYAFC_demo/rag_dir
         INPUT_DIR = f"{path}/output"
         COMMUNITY_TABLE = "create_final_communities"
         COMMUNITY_REPORT_TABLE = "create_final_community_reports"
@@ -174,7 +171,7 @@ class Graphrag(GBOP):
 
     def infer_formalization(self, messages, k=None, url=None):
         if url is None:
-            url = 'http://10.209.76.196:8501/v1'
+            url = URL_HOST
         # process community by morals
         final_report = []
         for report in self.all_reports:
@@ -211,10 +208,8 @@ class Graphrag(GBOP):
             try:
                 pattern = r'"Instruction":\s*"([^"]+)"\s*,\s*"score":\s*(\d+)'
 
-                # 使用正则表达式提取所有匹配项
                 matches = re.findall(pattern, search_response)
 
-                # 将提取的值组合成字典列表
                 real_response = {'Instructions':[{"Instruction": answer, "score": int(score)} for answer, score in matches]}
             except:
                 real_response={'Instructions':[{'Instruction':'','score':-1}]}
@@ -244,7 +239,7 @@ class Graphrag(GBOP):
             reverse=True,  # type: ignore
         )
         data = []
-        for point in filtered_key_points[:k]:  ## 取top
+        for point in filtered_key_points[:k]:
             formatted_response_data = []
             formatted_response_data.append(
                 f'----Instruction {point["analyst"] + 1}----'
@@ -328,7 +323,6 @@ class Graphrag(GBOP):
             # print(item)
             if item.choices[0].delta.content:
                 result += item.choices[0].delta.content
-                # print(result)
         return result
 
 
